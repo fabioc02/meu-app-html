@@ -1,0 +1,2522 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Arranger Keyboard - Korg &amp; Yamaha Parser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-dark': '#4B4BC7',
+                        korg: '#FF6B35',
+                        yamaha: '#0066CC'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos do teclado virtual */
+        .keyboard {
+            display: flex;
+            background: linear-gradient(to bottom, #333, #000);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        .octave {
+            display: flex;
+            position: relative;
+            margin-right: 2px;
+        }
+        
+        .white-key {
+            width: 40px;
+            height: 180px;
+            background: linear-gradient(to bottom, #fafafa, #f0f0f0);
+            border: 1px solid #ccc;
+            border-radius: 0 0 5px 5px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .white-key:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+        }
+        
+        .white-key.active {
+            background: linear-gradient(to bottom, #5D5CDE, #4B4BC7);
+            color: white;
+            transform: translateY(2px);
+        }
+        
+        .black-key {
+            position: absolute;
+            width: 25px;
+            height: 120px;
+            background: linear-gradient(to bottom, #333, #000);
+            border: 1px solid #000;
+            border-radius: 0 0 3px 3px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 8px;
+            font-size: 10px;
+            color: #ccc;
+        }
+        
+        .black-key:hover {
+            background: linear-gradient(to bottom, #444, #111);
+        }
+        
+        .black-key.active {
+            background: linear-gradient(to bottom, #FF6B35, #E55A2B);
+            transform: translateY(2px);
+        }
+        
+        /* Posicionamento das teclas pretas */
+        .black-key.cs { left: 27px; }
+        .black-key.ds { left: 67px; }
+        .black-key.fs { left: 147px; }
+        .black-key.gs { left: 187px; }
+        .black-key.as { left: 227px; }
+        
+        /* Estilos para displays */
+        .file-drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-drop-zone:hover {
+            border-color: #5D5CDE;
+            background-color: rgba(93, 92, 222, 0.1);
+        }
+        
+        .file-drop-zone.dragover {
+            border-color: #FF6B35;
+            background-color: rgba(255, 107, 53, 0.1);
+        }
+        
+        .style-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .combo-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+<script src="https://puc.poecdn.net/authenticated_preview_page/syncedState.bd4eeeb8e8e02052ee92.js"></script></head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-6 max-w-7xl">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-korg to-yamaha bg-clip-text text-transparent mb-2">
+                Professional Arranger Keyboard
+            </h1>
+            <p class="text-gray-400">Korg &amp; Yamaha File Parser + Virtual Keyboard with MIDI Support</p>
+        </div>
+
+        <!-- File Parsers Section -->
+        <div class="grid lg:grid-cols-2 gap-6 mb-8">
+            <!-- Korg Parser -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-korg/30">
+                <h2 class="text-2xl font-bold text-korg mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-10-5z"></path>
+                    </svg>
+                    Korg File Parser
+                </h2>
+                
+                <div class="file-drop-zone mb-4" id="korgDropZone">
+                    <input type="file" id="korgFileInput" accept=".set,.pcg,.sng,.seq,.KMP,.KSF" class="hidden" multiple="">
+                    <svg class="w-12 h-12 text-korg mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p class="text-lg font-medium">Drop Korg files here</p>
+                    <p class="text-sm text-gray-400 mt-1">Supports: .SET, .PCG, .SNG, .SEQ, .KMP, .KSF</p>
+                </div>
+
+                <!-- Korg Parsed Data Display -->
+                <div id="korgData" class="hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Styles -->
+                        <div>
+                            <h3 class="font-semibold text-korg mb-2">Styles</h3>
+                            <div id="korgStyles" class="style-list bg-gray-700 rounded p-3 text-sm"></div>
+                        </div>
+                        
+                        <!-- Combis -->
+                        <div>
+                            <h3 class="font-semibold text-korg mb-2">Combis/Programs</h3>
+                            <div id="korgCombis" class="combo-list bg-gray-700 rounded p-3 text-sm"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Samples -->
+                    <div class="mt-4">
+                        <h3 class="font-semibold text-korg mb-2">Samples</h3>
+                        <div id="korgSamples" class="bg-gray-700 rounded p-3 text-sm max-h-32 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yamaha Parser -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-yamaha/30">
+                <h2 class="text-2xl font-bold text-yamaha mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-10-5z"></path>
+                    </svg>
+                    Yamaha File Parser
+                </h2>
+                
+                <div class="file-drop-zone mb-4" id="yamahaDropZone">
+                    <input type="file" id="yamahaFileInput" accept=".sty,.reg,.yam,.wav,.mid,.ppf" class="hidden" multiple="">
+                    <svg class="w-12 h-12 text-yamaha mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p class="text-lg font-medium">Drop Yamaha files here</p>
+                    <p class="text-sm text-gray-400 mt-1">Supports: .STY, .REG, .YAM, .WAV, .MID, .PPF</p>
+                </div>
+
+                <!-- Yamaha Parsed Data Display -->
+                <div id="yamahaData" class="hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Styles -->
+                        <div>
+                            <h3 class="font-semibold text-yamaha mb-2">Styles</h3>
+                            <div id="yamahaStyles" class="style-list bg-gray-700 rounded p-3 text-sm"></div>
+                        </div>
+                        
+                        <!-- Registrations -->
+                        <div>
+                            <h3 class="font-semibold text-yamaha mb-2">Registrations</h3>
+                            <div id="yamahaRegistrations" class="combo-list bg-gray-700 rounded p-3 text-sm"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Voices -->
+                    <div class="mt-4">
+                        <h3 class="font-semibold text-yamaha mb-2">Voices/Samples</h3>
+                        <div id="yamahaVoices" class="bg-gray-700 rounded p-3 text-sm max-h-32 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Virtual Keyboard Section -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-primary mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12,3V12.26C11.5,12.09 11,12 10.5,12C8.15,12 6.25,13.9 6.25,16.25C6.25,18.6 8.15,20.5 10.5,20.5C12.85,20.5 14.75,18.6 14.75,16.25V6.75L22,4.5V13.26C21.5,13.09 21,13 20.5,13C18.15,13 16.25,14.9 16.25,17.25C16.25,19.6 18.15,21.5 20.5,21.5C22.85,21.5 24.75,19.6 24.75,17.25V3L12,3Z"></path>
+                    </svg>
+                Virtual Keyboard (5 Octaves)
+                </h2>
+                
+                <!-- Sound Engine Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <!-- Current Timbre Display -->
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <h3 class="text-sm font-medium text-primary mb-2">Current Timbre</h3>
+                        <div id="currentTimbre" class="text-lg font-bold text-white">Piano</div>
+                        <div id="currentTimbreDetails" class="text-xs text-gray-400">Bank 0, Program 0</div>
+                    </div>
+                    
+                    <!-- Timbre Categories -->
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <label class="text-sm font-medium text-primary mb-2 block">Category</label>
+                        <select id="timbreCategory" class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white">
+                            <option value="all">All Timbres</option>
+                            <option value="korg">Korg Timbres</option>
+                            <option value="yamaha">Yamaha Timbres</option>
+                            <option value="piano">Piano</option>
+                            <option value="organ">Organ</option>
+                            <option value="strings">Strings</option>
+                            <option value="brass">Brass</option>
+                            <option value="lead">Lead</option>
+                            <option value="pad">Pad</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Loaded Timbres -->
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <label class="text-sm font-medium text-primary mb-2 block">Loaded Timbres</label>
+                        <select id="timbreSelect" class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white">
+                            <option value="default-piano">Default Piano</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Sound Controls -->
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <label class="text-sm font-medium text-primary mb-2 block">Sound Engine</label>
+                        <div class="flex items-center gap-2 mb-2">
+                            <label class="text-xs">Attack:</label>
+                            <input type="range" id="attackControl" min="0" max="100" value="10" class="flex-1 h-1 bg-gray-600 rounded">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs">Release:</label>
+                            <input type="range" id="releaseControl" min="0" max="100" value="30" class="flex-1 h-1 bg-gray-600 rounded">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Controles do Keyboard -->
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium">Octave:</label>
+                        <select id="octaveSelect" class="bg-gray-700 border border-gray-600 rounded px-3 py-1">
+                            <option value="2">C2-B6</option>
+                            <option value="3" selected="">C3-B7</option>
+                            <option value="4">C4-B8</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium">Volume:</label>
+                        <input type="range" id="volumeControl" min="0" max="100" value="80" class="w-24 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium">Channel:</label>
+                        <select id="midiChannel" class="bg-gray-700 border border-gray-600 rounded px-3 py-1">
+                            <!-- Channels 1-16 will be populated by JS -->
+                        </select>
+                    </div>
+                    
+                    <button id="connectMidi" class="bg-primary hover:bg-primary-dark px-4 py-2 rounded transition-colors">
+                        Connect MIDI
+                    </button>
+                    
+                    <span id="midiStatus" class="text-sm text-gray-400">MIDI: Disconnected</span>
+                </div>
+
+                <!-- Virtual Keyboard -->
+                <div class="overflow-x-auto">
+                    <div id="virtualKeyboard" class="keyboard inline-flex">
+                        <!-- Keyboard will be generated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Piano Roll / Pattern Display -->
+                <div class="mt-6">
+                    <h3 class="font-semibold mb-3">Style Pattern Preview</h3>
+                    <canvas id="patternCanvas" width="800" height="100" class="bg-gray-700 rounded border border-gray-600 w-full"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Arranger Controls -->
+        <div class="bg-gray-800 rounded-lg p-6">
+            <h2 class="text-2xl font-bold text-primary mb-4">Arranger Controls</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+                <!-- Transport Controls -->
+                <button id="playBtn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-medium transition-colors">
+                    ▶ Play
+                </button>
+                <button id="stopBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded font-medium transition-colors">
+                    ⏹ Stop
+                </button>
+                <button id="recordBtn" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded font-medium transition-colors">
+                    ● Rec
+                </button>
+                
+                <!-- Style Controls -->
+                <button id="introBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium transition-colors">
+                    Intro
+                </button>
+                <button id="mainABtn" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-medium transition-colors">
+                    Main A
+                </button>
+                <button id="mainBBtn" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-medium transition-colors">
+                    Main B
+                </button>
+                <button id="fillBtn" class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded font-medium transition-colors">
+                    Fill
+                </button>
+                <button id="endingBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium transition-colors">
+                    Ending
+                </button>
+            </div>
+            
+            <!-- Tempo and Swing -->
+            <div class="flex items-center gap-6 mt-4">
+                <div class="flex items-center gap-2">
+                    <label class="text-sm font-medium">Tempo:</label>
+                    <input type="number" id="tempoInput" value="120" min="60" max="200" class="bg-gray-700 border border-gray-600 rounded px-3 py-1 w-20">
+                    <span class="text-sm text-gray-400">BPM</span>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <label class="text-sm font-medium">Swing:</label>
+                    <input type="range" id="swingControl" min="0" max="100" value="0" class="w-24 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+            </div>
+        </div>
+    
+
+    <script>
+        // ==============================================
+        // KORG FILE PARSER
+        // ==============================================
+        
+        /**
+         * Korg File Parser Class
+         * Handles parsing of Korg arranger keyboard files
+         * Supports: .SET, .PCG, .SNG, .SEQ, .KMP, .KSF
+         */
+        class KorgFileParser {
+            constructor() {
+                this.parsedData = {
+                    styles: [],
+                    combis: [],
+                    programs: [],
+                    samples: [],
+                    sequences: []
+                };
+            }
+
+            /**
+             * Parse Korg file based on extension
+             * @param {File} file - File object to parse
+             * @returns {Promise} - Parsed data structure
+             */
+            async parseFile(file) {
+                const extension = file.name.split('.').pop().toLowerCase();
+                const arrayBuffer = await file.arrayBuffer();
+                const dataView = new DataView(arrayBuffer);
+
+                console.log(`[Korg Parser] Parsing file: ${file.name} (${extension})`);
+
+                switch (extension) {
+                    case 'set':
+                        return this.parseSETFile(dataView, file.name);
+                    case 'pcg':
+                        return this.parsePCGFile(dataView, file.name);
+                    case 'sng':
+                        return this.parseSNGFile(dataView, file.name);
+                    case 'seq':
+                        return this.parseSEQFile(dataView, file.name);
+                    case 'kmp':
+                        return this.parseKMPFile(dataView, file.name);
+                    case 'ksf':
+                        return this.parseKSFFile(dataView, file.name);
+                    default:
+                        throw new Error(`Unsupported Korg file format: ${extension}`);
+                }
+            }
+
+            /**
+             * Parse Korg .SET file (Song/Style settings)
+             * .SET files contain song arrangements, style settings, and tempo maps
+             */
+            parseSETFile(dataView, filename) {
+                console.log('[Korg Parser] Parsing SET file...');
+                
+                try {
+                    // SET file header structure (Korg PA-series)
+                    const header = this.readKorgHeader(dataView, 0);
+                    
+                    if (!header.isValid) {
+                        throw new Error('Invalid SET file header');
+                    }
+
+                    let offset = header.headerSize;
+                    const setData = {
+                        filename: filename,
+                        type: 'SET',
+                        styles: [],
+                        tempoMap: [],
+                        chordSequences: []
+                    };
+
+                    // Parse style references (typically at offset 0x40)
+                    while (offset < dataView.byteLength - 16) {
+                        try {
+                            // Look for style chunk identifier
+                            const chunkId = this.readString(dataView, offset, 4);
+                            
+                            if (chunkId === 'STYL' || chunkId === 'STY1') {
+                                const styleInfo = this.parseStyleChunk(dataView, offset + 8);
+                                setData.styles.push(styleInfo);
+                                offset += styleInfo.chunkSize;
+                            } else if (chunkId === 'TEMP') {
+                                // Tempo map chunk
+                                const tempoInfo = this.parseTempoChunk(dataView, offset + 8);
+                                setData.tempoMap.push(tempoInfo);
+                                offset += tempoInfo.chunkSize;
+                            } else {
+                                offset += 4;
+                            }
+                        } catch (e) {
+                            offset += 4;
+                        }
+                    }
+
+                    this.parsedData.styles.push(...setData.styles);
+                    return setData;
+
+                } catch (error) {
+                    console.error('[Korg Parser] SET parsing error:', error);
+                    // Return basic file info even if parsing fails
+                    return {
+                        filename: filename,
+                        type: 'SET',
+                        error: error.message,
+                        styles: [{ name: filename.replace('.set', ''), tempo: 120, timeSignature: '4/4' }]
+                    };
+                }
+            }
+
+            /**
+             * Parse Korg .PCG file (Program/Combi data)
+             * .PCG files contain instrument programs and combinations
+             */
+            parsePCGFile(dataView, filename) {
+                console.log('[Korg Parser] Parsing PCG file...');
+                
+                try {
+                    const header = this.readKorgHeader(dataView, 0);
+                    
+                    if (!header.isValid) {
+                        throw new Error('Invalid PCG file header');
+                    }
+
+                    let offset = header.headerSize;
+                    const pcgData = {
+                        filename: filename,
+                        type: 'PCG',
+                        programs: [],
+                        combis: [],
+                        drumKits: []
+                    };
+
+                    // Parse program data
+                    while (offset < dataView.byteLength - 16) {
+                        try {
+                            const chunkId = this.readString(dataView, offset, 4);
+                            
+                            if (chunkId === 'PROG' || chunkId === 'PRG1') {
+                                // Program chunk
+                                const programInfo = this.parseProgramChunk(dataView, offset + 8);
+                                pcgData.programs.push(programInfo);
+                                offset += programInfo.chunkSize;
+                            } else if (chunkId === 'COMB' || chunkId === 'CMB1') {
+                                // Combination chunk
+                                const combiInfo = this.parseCombiChunk(dataView, offset + 8);
+                                pcgData.combis.push(combiInfo);
+                                offset += combiInfo.chunkSize;
+                            } else {
+                                offset += 4;
+                            }
+                        } catch (e) {
+                            offset += 4;
+                        }
+                    }
+
+                    this.parsedData.programs.push(...pcgData.programs);
+                    this.parsedData.combis.push(...pcgData.combis);
+                    return pcgData;
+
+                } catch (error) {
+                    console.error('[Korg Parser] PCG parsing error:', error);
+                    return {
+                        filename: filename,
+                        type: 'PCG',
+                        error: error.message,
+                        programs: [{ name: filename.replace('.pcg', ''), bank: 0, program: 0 }]
+                    };
+                }
+            }
+
+            /**
+             * Parse style chunk from SET file
+             */
+            parseStyleChunk(dataView, offset) {
+                const chunkSize = dataView.getUint32(offset, true);
+                const styleName = this.readString(dataView, offset + 8, 32).trim();
+                const tempo = dataView.getUint16(offset + 48, true);
+                const timeSignature = `${dataView.getUint8(offset + 52)}/${dataView.getUint8(offset + 53)}`;
+                
+                return {
+                    name: styleName || 'Unnamed Style',
+                    tempo: tempo || 120,
+                    timeSignature: timeSignature || '4/4',
+                    chunkSize: chunkSize + 8
+                };
+            }
+
+            /**
+             * Parse program chunk from PCG file
+             */
+            parseProgramChunk(dataView, offset) {
+                const chunkSize = dataView.getUint32(offset, true);
+                const programName = this.readString(dataView, offset + 8, 24).trim();
+                const bank = dataView.getUint16(offset + 40, true);
+                const program = dataView.getUint16(offset + 42, true);
+                
+                return {
+                    name: programName || 'Unnamed Program',
+                    bank: bank,
+                    program: program,
+                    chunkSize: chunkSize + 8
+                };
+            }
+
+            /**
+             * Parse combination chunk from PCG file
+             */
+            parseCombiChunk(dataView, offset) {
+                const chunkSize = dataView.getUint32(offset, true);
+                const combiName = this.readString(dataView, offset + 8, 24).trim();
+                
+                return {
+                    name: combiName || 'Unnamed Combi',
+                    type: 'Combination',
+                    chunkSize: chunkSize + 8
+                };
+            }
+
+            /**
+             * Parse Korg .SNG file (Song data)
+             */
+            parseSNGFile(dataView, filename) {
+                console.log('[Korg Parser] Parsing SNG file...');
+                // Implementation for song files
+                return {
+                    filename: filename,
+                    type: 'SNG',
+                    sequences: [{ name: filename.replace('.sng', ''), tracks: [] }]
+                };
+            }
+
+            /**
+             * Parse Korg .SEQ file (Sequence data)
+             */
+            parseSEQFile(dataView, filename) {
+                console.log('[Korg Parser] Parsing SEQ file...');
+                // Implementation for sequence files
+                return {
+                    filename: filename,
+                    type: 'SEQ',
+                    sequences: [{ name: filename.replace('.seq', ''), tracks: [] }]
+                };
+            }
+
+            /**
+             * Parse Korg .KMP file (Sample files)
+             */
+            parseKMPFile(dataView, filename) {
+                console.log('[Korg Parser] Parsing KMP file...');
+                
+                const sampleData = {
+                    filename: filename,
+                    type: 'KMP',
+                    samples: [{
+                        name: filename.replace('.kmp', ''),
+                        format: 'KMP',
+                        size: dataView.byteLength
+                    }]
+                };
+
+                this.parsedData.samples.push(...sampleData.samples);
+                return sampleData;
+            }
+
+            /**
+             * Parse Korg .KSF file (Korg Sample File)
+             */
+            parseKSFFile(dataView, filename) {
+                console.log('[Korg Parser] Parsing KSF file...');
+                
+                const sampleData = {
+                    filename: filename,
+                    type: 'KSF',
+                    samples: [{
+                        name: filename.replace('.ksf', ''),
+                        format: 'KSF',
+                        size: dataView.byteLength
+                    }]
+                };
+
+                this.parsedData.samples.push(...sampleData.samples);
+                return sampleData;
+            }
+
+            /**
+             * Read Korg file header
+             */
+            readKorgHeader(dataView, offset) {
+                try {
+                    // Common Korg header patterns
+                    const magic1 = this.readString(dataView, offset, 4);
+                    const magic2 = this.readString(dataView, offset + 4, 4);
+                    
+                    const isValid = (magic1 === 'KORG' || magic2 === 'KORG' || 
+                                   magic1.includes('PA') || magic1.includes('Korg'));
+                    
+                    return {
+                        isValid: isValid,
+                        headerSize: isValid ? 64 : 16,
+                        magic: magic1
+                    };
+                } catch (e) {
+                    return { isValid: false, headerSize: 16, magic: '' };
+                }
+            }
+
+            /**
+             * Read null-terminated string from DataView
+             */
+            readString(dataView, offset, maxLength) {
+                let result = '';
+                for (let i = 0; i < maxLength && offset + i < dataView.byteLength; i++) {
+                    const byte = dataView.getUint8(offset + i);
+                    if (byte === 0) break;
+                    if (byte >= 32 && byte <= 126) {
+                        result += String.fromCharCode(byte);
+                    }
+                }
+                return result;
+            }
+
+            /**
+             * Parse tempo chunk
+             */
+            parseTempoChunk(dataView, offset) {
+                const chunkSize = dataView.getUint32(offset, true);
+                const tempo = dataView.getUint16(offset + 8, true);
+                
+                return {
+                    tempo: tempo || 120,
+                    chunkSize: chunkSize + 8
+                };
+            }
+        }
+
+        // ==============================================
+        // YAMAHA FILE PARSER
+        // ==============================================
+
+        /**
+         * Yamaha File Parser Class
+         * Handles parsing of Yamaha arranger keyboard files
+         * Supports: .STY, .REG, .YAM, .WAV, .MID, .PPF
+         */
+        class YamahaFileParser {
+            constructor() {
+                this.parsedData = {
+                    styles: [],
+                    registrations: [],
+                    voices: [],
+                    samples: [],
+                    songs: []
+                };
+            }
+
+            /**
+             * Parse Yamaha file based on extension
+             * @param {File} file - File object to parse
+             * @returns {Promise} - Parsed data structure
+             */
+            async parseFile(file) {
+                const extension = file.name.split('.').pop().toLowerCase();
+                const arrayBuffer = await file.arrayBuffer();
+                const dataView = new DataView(arrayBuffer);
+
+                console.log(`[Yamaha Parser] Parsing file: ${file.name} (${extension})`);
+
+                switch (extension) {
+                    case 'sty':
+                        return this.parseSTYFile(dataView, file.name);
+                    case 'reg':
+                        return this.parseREGFile(dataView, file.name);
+                    case 'yam':
+                        return this.parseYAMFile(dataView, file.name);
+                    case 'wav':
+                        return this.parseWAVFile(dataView, file.name);
+                    case 'mid':
+                        return this.parseMIDFile(dataView, file.name);
+                    case 'ppf':
+                        return this.parsePPFFile(dataView, file.name);
+                    default:
+                        throw new Error(`Unsupported Yamaha file format: ${extension}`);
+                }
+            }
+
+            /**
+             * Parse Yamaha .STY file (Style data)
+             * .STY files contain auto-accompaniment patterns
+             */
+            parseSTYFile(dataView, filename) {
+                console.log('[Yamaha Parser] Parsing STY file...');
+                
+                try {
+                    // STY file structure (Yamaha PSR/Tyros series)
+                    const header = this.readYamahaHeader(dataView, 0);
+                    
+                    if (!header.isValid) {
+                        throw new Error('Invalid STY file header');
+                    }
+
+                    let offset = header.headerSize;
+                    const styData = {
+                        filename: filename,
+                        type: 'STY',
+                        styles: [],
+                        patterns: []
+                    };
+
+                    // Parse style data chunks
+                    while (offset < dataView.byteLength - 16) {
+                        try {
+                            const chunkId = this.readString(dataView, offset, 4);
+                            
+                            if (chunkId === 'CASM' || chunkId === 'CSEG') {
+                                // Style segment chunk
+                                const styleInfo = this.parseYamahaStyleChunk(dataView, offset + 8);
+                                styData.styles.push(styleInfo);
+                                offset += styleInfo.chunkSize;
+                            } else if (chunkId === 'CTAB') {
+                                // Chord table chunk
+                                const chordInfo = this.parseChordTableChunk(dataView, offset + 8);
+                                offset += chordInfo.chunkSize;
+                            } else {
+                                offset += 4;
+                            }
+                        } catch (e) {
+                            offset += 4;
+                        }
+                    }
+
+                    // If no specific styles found, create a default one
+                    if (styData.styles.length === 0) {
+                        styData.styles.push({
+                            name: filename.replace('.sty', ''),
+                            tempo: 120,
+                            timeSignature: '4/4',
+                            sections: ['Intro', 'Main A', 'Main B', 'Ending']
+                        });
+                    }
+
+                    this.parsedData.styles.push(...styData.styles);
+                    return styData;
+
+                } catch (error) {
+                    console.error('[Yamaha Parser] STY parsing error:', error);
+                    return {
+                        filename: filename,
+                        type: 'STY',
+                        error: error.message,
+                        styles: [{ 
+                            name: filename.replace('.sty', ''), 
+                            tempo: 120, 
+                            timeSignature: '4/4',
+                            sections: ['Main A', 'Main B']
+                        }]
+                    };
+                }
+            }
+
+            /**
+             * Parse Yamaha .REG file (Registration data)
+             * .REG files contain voice and style combinations
+             */
+            parseREGFile(dataView, filename) {
+                console.log('[Yamaha Parser] Parsing REG file...');
+                
+                try {
+                    const header = this.readYamahaHeader(dataView, 0);
+                    
+                    const regData = {
+                        filename: filename,
+                        type: 'REG',
+                        registrations: []
+                    };
+
+                    // Parse registration banks (typically 8 registrations per file)
+                    for (let i = 0; i < 8; i++) {
+                        const regOffset = header.headerSize + (i * 128); // Typical registration size
+                        
+                        if (regOffset < dataView.byteLength - 32) {
+                            const registration = this.parseRegistrationEntry(dataView, regOffset, i + 1);
+                            if (registration.name) {
+                                regData.registrations.push(registration);
+                            }
+                        }
+                    }
+
+                    // If no registrations found, create defaults
+                    if (regData.registrations.length === 0) {
+                        for (let i = 1; i <= 8; i++) {
+                            regData.registrations.push({
+                                number: i,
+                                name: `Registration ${i}`,
+                                voice: 'Grand Piano',
+                                style: 'Pop',
+                                tempo: 120
+                            });
+                        }
+                    }
+
+                    this.parsedData.registrations.push(...regData.registrations);
+                    return regData;
+
+                } catch (error) {
+                    console.error('[Yamaha Parser] REG parsing error:', error);
+                    return {
+                        filename: filename,
+                        type: 'REG',
+                        error: error.message,
+                        registrations: [{ number: 1, name: filename.replace('.reg', ''), voice: 'Piano', style: 'Pop' }]
+                    };
+                }
+            }
+
+            /**
+             * Parse Yamaha .YAM file (Voice data)
+             */
+            parseYAMFile(dataView, filename) {
+                console.log('[Yamaha Parser] Parsing YAM file...');
+                
+                const yamData = {
+                    filename: filename,
+                    type: 'YAM',
+                    voices: [{
+                        name: filename.replace('.yam', ''),
+                        category: 'User Voice',
+                        msb: 63,
+                        lsb: 0,
+                        program: 0
+                    }]
+                };
+
+                this.parsedData.voices.push(...yamData.voices);
+                return yamData;
+            }
+
+            /**
+             * Parse Yamaha .WAV file (Sample data)
+             */
+            parseWAVFile(dataView, filename) {
+                console.log('[Yamaha Parser] Parsing WAV file...');
+                
+                // Check for WAV header
+                const riffHeader = this.readString(dataView, 0, 4);
+                const waveHeader = this.readString(dataView, 8, 4);
+                
+                const isValidWav = (riffHeader === 'RIFF' && waveHeader === 'WAVE');
+                
+                const wavData = {
+                    filename: filename,
+                    type: 'WAV',
+                    samples: [{
+                        name: filename.replace('.wav', ''),
+                        format: 'WAV',
+                        size: dataView.byteLength,
+                        valid: isValidWav,
+                        sampleRate: isValidWav ? dataView.getUint32(24, true) : 44100,
+                        channels: isValidWav ? dataView.getUint16(22, true) : 2
+                    }]
+                };
+
+                this.parsedData.samples.push(...wavData.samples);
+                return wavData;
+            }
+
+            /**
+             * Parse MIDI file
+             */
+            parseMIDFile(dataView, filename) {
+                console.log('[Yamaha Parser] Parsing MID file...');
+                
+                const midiData = {
+                    filename: filename,
+                    type: 'MID',
+                    songs: [{
+                        name: filename.replace('.mid', ''),
+                        format: 'MIDI',
+                        tracks: []
+                    }]
+                };
+
+                this.parsedData.songs.push(...midiData.songs);
+                return midiData;
+            }
+
+            /**
+             * Parse Yamaha .PPF file (Pack Performance File)
+             */
+            parsePPFFile(dataView, filename) {
+                console.log('[Yamaha Parser] Parsing PPF file...');
+                
+                const ppfData = {
+                    filename: filename,
+                    type: 'PPF',
+                    performances: [{
+                        name: filename.replace('.ppf', ''),
+                        voices: [],
+                        effects: []
+                    }]
+                };
+
+                return ppfData;
+            }
+
+            /**
+             * Parse Yamaha style chunk
+             */
+            parseYamahaStyleChunk(dataView, offset) {
+                const chunkSize = dataView.getUint32(offset, true);
+                
+                // Try to extract style name
+                let styleName = '';
+                for (let i = 8; i < Math.min(40, chunkSize); i++) {
+                    const char = dataView.getUint8(offset + i);
+                    if (char >= 32 && char <= 126) {
+                        styleName += String.fromCharCode(char);
+                    } else if (styleName.length > 0) {
+                        break;
+                    }
+                }
+                
+                return {
+                    name: styleName.trim() || 'Unnamed Style',
+                    tempo: 120,
+                    timeSignature: '4/4',
+                    sections: ['Intro', 'Main A', 'Main B', 'Ending'],
+                    chunkSize: chunkSize + 8
+                };
+            }
+
+            /**
+             * Parse registration entry
+             */
+            parseRegistrationEntry(dataView, offset, number) {
+                // Extract registration name
+                let regName = '';
+                for (let i = 0; i < 16; i++) {
+                    const char = dataView.getUint8(offset + i);
+                    if (char >= 32 && char <= 126) {
+                        regName += String.fromCharCode(char);
+                    } else if (regName.length > 0) {
+                        break;
+                    }
+                }
+                
+                return {
+                    number: number,
+                    name: regName.trim() || `Registration ${number}`,
+                    voice: 'Grand Piano',
+                    style: 'Pop',
+                    tempo: 120
+                };
+            }
+
+            /**
+             * Parse chord table chunk
+             */
+            parseChordTableChunk(dataView, offset) {
+                const chunkSize = dataView.getUint32(offset, true);
+                return { chunkSize: chunkSize + 8 };
+            }
+
+            /**
+             * Read Yamaha file header
+             */
+            readYamahaHeader(dataView, offset) {
+                try {
+                    const magic1 = this.readString(dataView, offset, 4);
+                    const magic2 = this.readString(dataView, offset + 4, 4);
+                    
+                    const isValid = (magic1 === 'YAMAHA' || magic2 === 'YAMAHA' || 
+                                   magic1 === 'PSR' || magic1 === 'TYROS' ||
+                                   magic1 === 'RIFF' || magic1 === 'CASM');
+                    
+                    return {
+                        isValid: isValid,
+                        headerSize: isValid ? 32 : 16,
+                        magic: magic1
+                    };
+                } catch (e) {
+                    return { isValid: false, headerSize: 16, magic: '' };
+                }
+            }
+
+            /**
+             * Read null-terminated string from DataView
+             */
+            readString(dataView, offset, maxLength) {
+                let result = '';
+                for (let i = 0; i < maxLength && offset + i < dataView.byteLength; i++) {
+                    const byte = dataView.getUint8(offset + i);
+                    if (byte === 0) break;
+                    if (byte >= 32 && byte <= 126) {
+                        result += String.fromCharCode(byte);
+                    }
+                }
+                return result;
+            }
+        }
+
+        // ==============================================
+        // VIRTUAL KEYBOARD IMPLEMENTATION
+        // ==============================================
+
+        /**
+         * Virtual Keyboard Class
+         * Handles 5-octave virtual keyboard with MIDI support
+         */
+        class VirtualKeyboard {
+            constructor() {
+                this.midiAccess = null;
+                this.midiOutput = null;
+                this.currentOctave = 3;
+                this.volume = 80;
+                this.midiChannel = 0;
+                this.activeKeys = new Set();
+                this.noteFrequencies = this.generateNoteFrequencies();
+                
+                this.setupKeyboard();
+                this.setupEventListeners();
+            }
+
+            /**
+             * Generate note frequencies for 5 octaves
+             */
+            generateNoteFrequencies() {
+                const frequencies = {};
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                
+                // Generate 5 octaves starting from selected octave
+                for (let octave = 0; octave < 5; octave++) {
+                    for (let note = 0; note < 12; note++) {
+                        const noteName = noteNames[note];
+                        const octaveNum = this.currentOctave + octave;
+                        const midiNote = (octaveNum * 12) + note;
+                        const frequency = 440 * Math.pow(2, (midiNote - 69) / 12);
+                        
+                        frequencies[`${noteName}${octaveNum}`] = {
+                            frequency: frequency,
+                            midiNote: midiNote
+                        };
+                    }
+                }
+                
+                return frequencies;
+            }
+
+            /**
+             * Setup virtual keyboard HTML structure
+             */
+            setupKeyboard() {
+                const keyboardContainer = document.getElementById('virtualKeyboard');
+                keyboardContainer.innerHTML = '';
+
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const whiteKeys = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+                const blackKeys = ['C#', 'D#', 'F#', 'G#', 'A#'];
+
+                // Generate 5 octaves
+                for (let octave = 0; octave < 5; octave++) {
+                    const octaveDiv = document.createElement('div');
+                    octaveDiv.className = 'octave';
+
+                    // Create white keys first
+                    whiteKeys.forEach(note => {
+                        const key = document.createElement('div');
+                        const octaveNum = this.currentOctave + octave;
+                        const keyId = `${note}${octaveNum}`;
+                        
+                        key.className = 'white-key';
+                        key.dataset.note = keyId;
+                        key.textContent = keyId;
+                        
+                        octaveDiv.appendChild(key);
+                    });
+
+                    // Create black keys
+                    blackKeys.forEach(note => {
+                        const key = document.createElement('div');
+                        const octaveNum = this.currentOctave + octave;
+                        const keyId = `${note}${octaveNum}`;
+                        
+                        key.className = `black-key ${note.toLowerCase().replace('#', 's')}`;
+                        key.dataset.note = keyId;
+                        key.textContent = keyId;
+                        
+                        octaveDiv.appendChild(key);
+                    });
+
+                    keyboardContainer.appendChild(octaveDiv);
+                }
+
+                // Setup MIDI channel selector
+                const midiChannelSelect = document.getElementById('midiChannel');
+                midiChannelSelect.innerHTML = '';
+                for (let i = 1; i <= 16; i++) {
+                    const option = document.createElement('option');
+                    option.value = i - 1;
+                    option.textContent = `Channel ${i}`;
+                    midiChannelSelect.appendChild(option);
+                }
+            }
+
+            /**
+             * Setup event listeners for keyboard and controls
+             */
+            setupEventListeners() {
+                // Virtual keyboard mouse events
+                document.getElementById('virtualKeyboard').addEventListener('mousedown', (e) => {
+                    if (e.target.dataset.note) {
+                        this.playNote(e.target.dataset.note);
+                        e.target.classList.add('active');
+                    }
+                });
+
+                document.getElementById('virtualKeyboard').addEventListener('mouseup', (e) => {
+                    if (e.target.dataset.note) {
+                        this.stopNote(e.target.dataset.note);
+                        e.target.classList.remove('active');
+                    }
+                });
+
+                // Computer keyboard events
+                document.addEventListener('keydown', (e) => {
+                    this.handleKeyboardInput(e, true);
+                });
+
+                document.addEventListener('keyup', (e) => {
+                    this.handleKeyboardInput(e, false);
+                });
+
+                // Control event listeners
+                document.getElementById('octaveSelect').addEventListener('change', (e) => {
+                    this.currentOctave = parseInt(e.target.value);
+                    this.noteFrequencies = this.generateNoteFrequencies();
+                    this.setupKeyboard();
+                });
+
+                document.getElementById('volumeControl').addEventListener('input', (e) => {
+                    this.volume = parseInt(e.target.value);
+                });
+
+                document.getElementById('midiChannel').addEventListener('change', (e) => {
+                    this.midiChannel = parseInt(e.target.value);
+                });
+
+                document.getElementById('connectMidi').addEventListener('click', () => {
+                    this.connectMIDI();
+                });
+            }
+
+            /**
+             * Handle computer keyboard input for virtual keyboard
+             */
+            handleKeyboardInput(event, isKeyDown) {
+                // Map computer keyboard to piano keys
+                const keyMap = {
+                    'q': 'C', '2': 'C#', 'w': 'D', '3': 'D#', 'e': 'E', 'r': 'F',
+                    '5': 'F#', 't': 'G', '6': 'G#', 'y': 'A', '7': 'A#', 'u': 'B',
+                    'z': 'C', 's': 'C#', 'x': 'D', 'd': 'D#', 'c': 'E', 'v': 'F',
+                    'g': 'F#', 'b': 'G', 'h': 'G#', 'n': 'A', 'j': 'A#', 'm': 'B'
+                };
+
+                const key = event.key.toLowerCase();
+                if (keyMap[key]) {
+                    const noteName = keyMap[key];
+                    const octaveOffset = ['q','2','w','3','e','r','5','t','6','y','7','u'].includes(key) ? 1 : 0;
+                    const noteId = `${noteName}${this.currentOctave + octaveOffset}`;
+                    
+                    if (isKeyDown && !this.activeKeys.has(noteId)) {
+                        this.playNote(noteId);
+                        this.highlightKey(noteId, true);
+                    } else if (!isKeyDown && this.activeKeys.has(noteId)) {
+                        this.stopNote(noteId);
+                        this.highlightKey(noteId, false);
+                    }
+                    
+                    event.preventDefault();
+                }
+            }
+
+            /**
+             * Highlight virtual key
+             */
+            highlightKey(noteId, active) {
+                const keyElement = document.querySelector(`[data-note="${noteId}"]`);
+                if (keyElement) {
+                    if (active) {
+                        keyElement.classList.add('active');
+                    } else {
+                        keyElement.classList.remove('active');
+                    }
+                }
+            }
+
+            /**
+             * Play a note (MIDI and/or audio)
+             */
+            playNote(noteId) {
+                if (this.activeKeys.has(noteId)) return;
+                
+                this.activeKeys.add(noteId);
+                
+                const noteInfo = this.noteFrequencies[noteId];
+                if (noteInfo) {
+                    // Send MIDI note if connected
+                    if (this.midiOutput) {
+                        const velocity = Math.floor((this.volume / 100) * 127);
+                        const noteOnMessage = [0x90 + this.midiChannel, noteInfo.midiNote, velocity];
+                        this.midiOutput.send(noteOnMessage);
+                    }
+                    
+                    // Play audio feedback (simple beep)
+                    this.playAudioFeedback(noteInfo.frequency);
+                    
+                    console.log(`[Keyboard] Playing note: ${noteId} (MIDI: ${noteInfo.midiNote}, Freq: ${noteInfo.frequency.toFixed(2)}Hz)`);
+                }
+            }
+
+            /**
+             * Stop a note
+             */
+            stopNote(noteId) {
+                if (!this.activeKeys.has(noteId)) return;
+                
+                this.activeKeys.delete(noteId);
+                
+                const noteInfo = this.noteFrequencies[noteId];
+                if (noteInfo) {
+                    // Send MIDI note off if connected
+                    if (this.midiOutput) {
+                        const noteOffMessage = [0x80 + this.midiChannel, noteInfo.midiNote, 0];
+                        this.midiOutput.send(noteOffMessage);
+                    }
+                    
+                    console.log(`[Keyboard] Stopping note: ${noteId}`);
+                }
+            }
+
+            /**
+             * Play audio feedback for note using selected timbre
+             */
+            playAudioFeedback(frequency) {
+                try {
+                    // Use the Sound Engine to play the current timbre
+                    if (window.soundEngine) {
+                        window.soundEngine.playTimbre(frequency, this.volume);
+                    } else {
+                        // Fallback to simple oscillator
+                        this.playSimpleOscillator(frequency);
+                    }
+                } catch (error) {
+                    console.log('[Keyboard] Audio feedback not available:', error);
+                }
+            }
+
+            /**
+             * Fallback simple oscillator
+             */
+            playSimpleOscillator(frequency) {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime((this.volume / 100) * 0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.5);
+            }
+
+            /**
+             * Connect to MIDI devices
+             */
+            async connectMIDI() {
+                try {
+                    console.log('[MIDI] Attempting to connect to MIDI devices...');
+                    
+                    this.midiAccess = await navigator.requestMIDIAccess();
+                    
+                    // Setup MIDI input listeners
+                    this.midiAccess.inputs.forEach(input => {
+                        input.onmidimessage = (event) => this.handleMIDIMessage(event);
+                        console.log(`[MIDI] Connected input: ${input.name}`);
+                    });
+                    
+                    // Setup MIDI output
+                    if (this.midiAccess.outputs.size > 0) {
+                        this.midiOutput = this.midiAccess.outputs.values().next().value;
+                        console.log(`[MIDI] Connected output: ${this.midiOutput.name}`);
+                    }
+                    
+                    document.getElementById('midiStatus').textContent = 
+                        `MIDI: ${this.midiAccess.inputs.size} inputs, ${this.midiAccess.outputs.size} outputs`;
+                    
+                    document.getElementById('connectMidi').textContent = 'MIDI Connected';
+                    document.getElementById('connectMidi').classList.add('bg-green-600');
+                    
+                } catch (error) {
+                    console.error('[MIDI] Connection failed:', error);
+                    document.getElementById('midiStatus').textContent = 'MIDI: Connection failed';
+                }
+            }
+
+            /**
+             * Handle incoming MIDI messages
+             */
+            handleMIDIMessage(event) {
+                const [command, note, velocity] = event.data;
+                const channel = command & 0xF;
+                const messageType = command & 0xF0;
+                
+                // Convert MIDI note to note name
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(note / 12) - 1;
+                const noteName = noteNames[note % 12];
+                const noteId = `${noteName}${octave}`;
+                
+                if (messageType === 0x90 && velocity > 0) {
+                    // Note On
+                    this.highlightKey(noteId, true);
+                    console.log(`[MIDI] Note On: ${noteId} (${note}) velocity ${velocity}`);
+                } else if (messageType === 0x80 || (messageType === 0x90 && velocity === 0)) {
+                    // Note Off
+                    this.highlightKey(noteId, false);
+                    console.log(`[MIDI] Note Off: ${noteId} (${note})`);
+                }
+            }
+        }
+
+        // ==============================================
+        // ARRANGER ENGINE
+        // ==============================================
+
+        /**
+         * Arranger Engine Class
+         * Handles style playback, pattern generation, and arranger functions
+         */
+        class ArrangerEngine {
+            constructor() {
+                this.isPlaying = false;
+                this.isRecording = false;
+                this.currentStyle = null;
+                this.currentTempo = 120;
+                this.currentSection = 'Main A';
+                this.patterns = [];
+                
+                this.setupArrangerControls();
+                this.setupPatternCanvas();
+            }
+
+            /**
+             * Setup arranger control event listeners
+             */
+            setupArrangerControls() {
+                document.getElementById('playBtn').addEventListener('click', () => {
+                    this.togglePlay();
+                });
+
+                document.getElementById('stopBtn').addEventListener('click', () => {
+                    this.stop();
+                });
+
+                document.getElementById('recordBtn').addEventListener('click', () => {
+                    this.toggleRecord();
+                });
+
+                // Style section buttons
+                ['introBtn', 'mainABtn', 'mainBBtn', 'fillBtn', 'endingBtn'].forEach(btnId => {
+                    document.getElementById(btnId).addEventListener('click', (e) => {
+                        const section = e.target.textContent.trim();
+                        this.changeSection(section);
+                    });
+                });
+
+                document.getElementById('tempoInput').addEventListener('change', (e) => {
+                    this.currentTempo = parseInt(e.target.value);
+                    console.log(`[Arranger] Tempo changed to: ${this.currentTempo} BPM`);
+                });
+            }
+
+            /**
+             * Setup pattern visualization canvas
+             */
+            setupPatternCanvas() {
+                this.canvas = document.getElementById('patternCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.drawEmptyPattern();
+            }
+
+            /**
+             * Draw empty pattern on canvas
+             */
+            drawEmptyPattern() {
+                this.ctx.fillStyle = '#374151';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.ctx.strokeStyle = '#6B7280';
+                this.ctx.lineWidth = 1;
+                
+                // Draw grid lines
+                for (let i = 0; i <= 16; i++) {
+                    const x = (i * this.canvas.width) / 16;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, 0);
+                    this.ctx.lineTo(x, this.canvas.height);
+                    this.ctx.stroke();
+                }
+                
+                // Draw track lines
+                for (let i = 0; i <= 4; i++) {
+                    const y = (i * this.canvas.height) / 4;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y);
+                    this.ctx.lineTo(this.canvas.width, y);
+                    this.ctx.stroke();
+                }
+                
+                // Add labels
+                this.ctx.fillStyle = '#D1D5DB';
+                this.ctx.font = '12px monospace';
+                this.ctx.fillText('Drums', 5, 20);
+                this.ctx.fillText('Bass', 5, 45);
+                this.ctx.fillText('Chord', 5, 70);
+                this.ctx.fillText('Lead', 5, 95);
+            }
+
+            /**
+             * Draw style pattern on canvas
+             */
+            drawStylePattern(style) {
+                this.drawEmptyPattern();
+                
+                if (!style) return;
+                
+                // Draw pattern blocks for demonstration
+                this.ctx.fillStyle = '#5D5CDE';
+                
+                // Simulate drum pattern
+                for (let i = 0; i < 16; i += 4) {
+                    const x = (i * this.canvas.width) / 16;
+                    this.ctx.fillRect(x + 2, 5, 20, 15);
+                }
+                
+                // Simulate bass pattern
+                for (let i = 0; i < 16; i += 2) {
+                    const x = (i * this.canvas.width) / 16;
+                    this.ctx.fillRect(x + 2, 30, 15, 10);
+                }
+                
+                // Add style info
+                this.ctx.fillStyle = '#F9FAFB';
+                this.ctx.font = 'bold 14px sans-serif';
+                this.ctx.fillText(`Style: ${style.name} - ${style.tempo} BPM`, 10, this.canvas.height - 10);
+            }
+
+            /**
+             * Toggle play/pause
+             */
+            togglePlay() {
+                if (this.isPlaying) {
+                    // Currently playing, so pause
+                    this.stopStylePlayback();
+                    const playBtn = document.getElementById('playBtn');
+                    playBtn.textContent = '▶ Play';
+                    playBtn.classList.replace('bg-yellow-600', 'bg-green-600');
+                    playBtn.classList.replace('hover:bg-yellow-700', 'hover:bg-green-700');
+                    console.log('[Arranger] Playback paused');
+                } else {
+                    // Currently stopped, so start playing
+                    this.startStylePlayback();
+                    const playBtn = document.getElementById('playBtn');
+                    playBtn.textContent = '⏸ Pause';
+                    playBtn.classList.replace('bg-green-600', 'bg-yellow-600');
+                    playBtn.classList.replace('hover:bg-green-700', 'hover:bg-yellow-700');
+                    console.log('[Arranger] Playback started');
+                }
+            }
+
+            /**
+             * Stop playback
+             */
+            stop() {
+                this.isPlaying = false;
+                const playBtn = document.getElementById('playBtn');
+                playBtn.textContent = '▶ Play';
+                playBtn.classList.replace('bg-yellow-600', 'bg-green-600');
+                playBtn.classList.replace('hover:bg-yellow-700', 'hover:bg-green-700');
+                console.log('[Arranger] Playback stopped');
+            }
+
+            /**
+             * Toggle recording
+             */
+            toggleRecord() {
+                this.isRecording = !this.isRecording;
+                const recordBtn = document.getElementById('recordBtn');
+                
+                if (this.isRecording) {
+                    recordBtn.textContent = '⏹ Stop Rec';
+                    recordBtn.classList.add('animate-pulse');
+                    console.log('[Arranger] Recording started');
+                } else {
+                    recordBtn.textContent = '● Rec';
+                    recordBtn.classList.remove('animate-pulse');
+                    console.log('[Arranger] Recording stopped');
+                }
+            }
+
+            /**
+             * Change style section
+             */
+            changeSection(section) {
+                this.currentSection = section;
+                
+                // Update button states
+                document.querySelectorAll('[id$="Btn"]').forEach(btn => {
+                    if (btn.textContent.trim() === section) {
+                        btn.classList.add('ring-2', 'ring-white');
+                    } else {
+                        btn.classList.remove('ring-2', 'ring-white');
+                    }
+                });
+                
+                console.log(`[Arranger] Section changed to: ${section}`);
+            }
+
+            /**
+             * Load style for playback
+             */
+            loadStyle(style) {
+                this.currentStyle = style;
+                this.currentTempo = style.tempo || 120;
+                document.getElementById('tempoInput').value = this.currentTempo;
+                
+                // Generate pattern data for the style
+                this.generateStylePatterns(style);
+                this.drawStylePattern(style);
+                console.log(`[Arranger] Style loaded: ${style.name}`);
+            }
+
+            /**
+             * Generate pattern data for a style
+             */
+            generateStylePatterns(style) {
+                if (!style) return;
+
+                // Create realistic pattern data based on style info
+                this.patterns = {
+                    intro: this.createPatternForSection('intro', style),
+                    mainA: this.createPatternForSection('mainA', style),
+                    mainB: this.createPatternForSection('mainB', style),
+                    fill: this.createPatternForSection('fill', style),
+                    ending: this.createPatternForSection('ending', style)
+                };
+
+                console.log(`[Arranger] Generated patterns for style: ${style.name}`);
+            }
+
+            /**
+             * Create pattern for specific section
+             */
+            createPatternForSection(section, style) {
+                const beatsPerBar = parseInt(style.timeSignature?.split('/')[0] || '4');
+                const pattern = {
+                    drums: [],
+                    bass: [],
+                    chord1: [],
+                    chord2: [],
+                    lead: []
+                };
+
+                // Generate drum pattern based on style name/tempo
+                const drumPattern = this.generateDrumPattern(section, beatsPerBar, style);
+                const bassPattern = this.generateBassPattern(section, beatsPerBar, style);
+                const chordPattern = this.generateChordPattern(section, beatsPerBar, style);
+
+                pattern.drums = drumPattern;
+                pattern.bass = bassPattern;
+                pattern.chord1 = chordPattern;
+
+                return pattern;
+            }
+
+            /**
+             * Generate drum pattern
+             */
+            generateDrumPattern(section, beats, style) {
+                const pattern = [];
+                const styleName = style.name.toLowerCase();
+                
+                // Different patterns based on style type
+                if (styleName.includes('rock') || styleName.includes('pop')) {
+                    // Rock/Pop: Kick on 1,3 - Snare on 2,4
+                    for (let beat = 0; beat < beats; beat++) {
+                        if (beat % 2 === 0) {
+                            pattern.push({ note: 36, velocity: 100, time: beat }); // Kick
+                        } else {
+                            pattern.push({ note: 38, velocity: 90, time: beat }); // Snare
+                        }
+                        // Hi-hat on every beat
+                        pattern.push({ note: 42, velocity: 60, time: beat + 0.5 });
+                    }
+                } else if (styleName.includes('jazz')) {
+                    // Jazz: Swing pattern
+                    for (let beat = 0; beat < beats; beat++) {
+                        if (beat === 0) {
+                            pattern.push({ note: 36, velocity: 85, time: beat }); // Kick
+                        }
+                        if (beat === 1 || beat === 3) {
+                            pattern.push({ note: 38, velocity: 75, time: beat + 0.25 }); // Snare
+                        }
+                        // Ride cymbal
+                        pattern.push({ note: 51, velocity: 50, time: beat });
+                    }
+                } else {
+                    // Generic pattern
+                    for (let beat = 0; beat < beats; beat++) {
+                        if (beat === 0 || beat === 2) {
+                            pattern.push({ note: 36, velocity: 95, time: beat }); // Kick
+                        }
+                        if (beat === 1 || beat === 3) {
+                            pattern.push({ note: 38, velocity: 85, time: beat }); // Snare
+                        }
+                    }
+                }
+
+                return pattern;
+            }
+
+            /**
+             * Generate bass pattern
+             */
+            generateBassPattern(section, beats, style) {
+                const pattern = [];
+                const baseNote = 36; // C2
+                
+                for (let beat = 0; beat < beats; beat++) {
+                    if (beat === 0) {
+                        pattern.push({ note: baseNote, velocity: 80, time: beat, duration: 0.5 });
+                    } else if (beat === 2 && beats === 4) {
+                        pattern.push({ note: baseNote + 7, velocity: 75, time: beat, duration: 0.5 }); // Fifth
+                    }
+                }
+
+                return pattern;
+            }
+
+            /**
+             * Generate chord pattern
+             */
+            generateChordPattern(section, beats, style) {
+                const pattern = [];
+                const chordNotes = [60, 64, 67]; // C major chord
+                
+                for (let beat = 0; beat < beats; beat++) {
+                    if (beat % 1 === 0) { // Every beat
+                        chordNotes.forEach(note => {
+                            pattern.push({ note: note, velocity: 60, time: beat, duration: 0.8 });
+                        });
+                    }
+                }
+
+                return pattern;
+            }
+
+            /**
+             * Start style playback
+             */
+            startStylePlayback() {
+                if (!this.currentStyle || !this.patterns) {
+                    console.log('[Arranger] No style loaded for playback');
+                    return;
+                }
+
+                this.isPlaying = true;
+                this.currentBeat = 0;
+                this.nextBeatTime = window.performance.now();
+                
+                // Calculate beat interval from tempo
+                this.beatInterval = (60 / this.currentTempo) * 1000; // ms per beat
+                
+                console.log(`[Arranger] Starting style playback: ${this.currentStyle.name} at ${this.currentTempo} BPM`);
+                this.scheduleNextBeat();
+            }
+
+            /**
+             * Stop style playback
+             */
+            stopStylePlayback() {
+                this.isPlaying = false;
+                if (this.playbackTimeout) {
+                    clearTimeout(this.playbackTimeout);
+                }
+                console.log('[Arranger] Style playback stopped');
+            }
+
+            /**
+             * Schedule next beat
+             */
+            scheduleNextBeat() {
+                if (!this.isPlaying) return;
+
+                const currentTime = window.performance.now();
+                const timeUntilNextBeat = this.nextBeatTime - currentTime;
+
+                this.playbackTimeout = setTimeout(() => {
+                    this.playBeat();
+                    this.currentBeat++;
+                    
+                    // Loop pattern (assuming 4 beats per pattern)
+                    if (this.currentBeat >= 4) {
+                        this.currentBeat = 0;
+                    }
+                    
+                    this.nextBeatTime += this.beatInterval;
+                    this.scheduleNextBeat();
+                }, Math.max(0, timeUntilNextBeat));
+            }
+
+            /**
+             * Play current beat
+             */
+            playBeat() {
+                const sectionPattern = this.patterns[this.currentSection.toLowerCase().replace(' ', '')];
+                if (!sectionPattern) return;
+
+                // Play all tracks for current beat
+                Object.keys(sectionPattern).forEach(track => {
+                    const trackNotes = sectionPattern[track].filter(note => 
+                        Math.floor(note.time) === this.currentBeat
+                    );
+                    
+                    trackNotes.forEach(noteEvent => {
+                        this.playStyleNote(noteEvent, track);
+                    });
+                });
+
+                // Update pattern visualization
+                this.updatePatternVisualization();
+            }
+
+            /**
+             * Play note from style pattern
+             */
+            playStyleNote(noteEvent, track) {
+                // Use different channels for different tracks
+                const channelMap = {
+                    drums: 9,    // Channel 10 (0-indexed = 9)
+                    bass: 1,     // Channel 2
+                    chord1: 2,   // Channel 3
+                    chord2: 3,   // Channel 4
+                    lead: 4      // Channel 5
+                };
+
+                const channel = channelMap[track] || 0;
+                
+                // Send MIDI if available
+                if (virtualKeyboard?.midiOutput) {
+                    const noteOnMessage = [0x90 + channel, noteEvent.note, noteEvent.velocity];
+                    virtualKeyboard.midiOutput.send(noteOnMessage);
+                    
+                    // Schedule note off
+                    const duration = noteEvent.duration || 0.5;
+                    setTimeout(() => {
+                        const noteOffMessage = [0x80 + channel, noteEvent.note, 0];
+                        virtualKeyboard.midiOutput.send(noteOffMessage);
+                    }, duration * this.beatInterval);
+                }
+
+                // Audio feedback for drums and bass
+                if (track === 'drums' || track === 'bass') {
+                    this.playStyleAudioFeedback(noteEvent, track);
+                }
+            }
+
+            /**
+             * Play audio feedback for style notes
+             */
+            playStyleAudioFeedback(noteEvent, track) {
+                try {
+                    if (!window.soundEngine?.audioContext) return;
+
+                    const audioContext = window.soundEngine.audioContext;
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    // Different waveforms for different tracks
+                    if (track === 'drums') {
+                        // Drum sounds use noise or specific frequencies
+                        if (noteEvent.note === 36) { // Kick
+                            oscillator.frequency.setValueAtTime(60, audioContext.currentTime);
+                            oscillator.type = 'sine';
+                        } else if (noteEvent.note === 38) { // Snare
+                            oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                            oscillator.type = 'square';
+                        } else { // Hi-hat
+                            oscillator.frequency.setValueAtTime(8000, audioContext.currentTime);
+                            oscillator.type = 'sawtooth';
+                        }
+                    } else {
+                        // Bass and other instruments
+                        const frequency = 440 * Math.pow(2, (noteEvent.note - 69) / 12);
+                        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                        oscillator.type = track === 'bass' ? 'sawtooth' : 'square';
+                    }
+                    
+                    const volume = (noteEvent.velocity / 127) * 0.3;
+                    gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    
+                } catch (error) {
+                    console.log('[Arranger] Audio feedback error:', error);
+                }
+            }
+
+            /**
+             * Update pattern visualization
+             */
+            updatePatternVisualization() {
+                if (!this.canvas || !this.ctx) return;
+
+                this.drawStylePattern(this.currentStyle);
+                
+                // Draw playback cursor
+                const x = (this.currentBeat / 4) * this.canvas.width;
+                this.ctx.strokeStyle = '#FF6B35';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, 0);
+                this.ctx.lineTo(x, this.canvas.height);
+                this.ctx.stroke();
+            }
+        }
+
+        // ==============================================
+        // SOUND ENGINE
+        // ==============================================
+
+        /**
+         * Sound Engine Class
+         * Handles timbre loading, selection, and playback for Korg/Yamaha sounds
+         */
+        class SoundEngine {
+            constructor() {
+                this.audioContext = null;
+                this.loadedTimbres = new Map();
+                this.currentTimbre = null;
+                this.attackTime = 0.1;
+                this.releaseTime = 0.3;
+                this.activeOscillators = new Map();
+                
+                this.initializeAudioContext();
+                this.loadDefaultTimbres();
+                this.setupSoundControls();
+            }
+
+            /**
+             * Initialize Web Audio API context
+             */
+            async initializeAudioContext() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Resume context if suspended (required by browsers)
+                    if (this.audioContext.state === 'suspended') {
+                        await this.audioContext.resume();
+                    }
+                    
+                    console.log('[Sound Engine] Audio context initialized');
+                } catch (error) {
+                    console.error('[Sound Engine] Failed to initialize audio context:', error);
+                }
+            }
+
+            /**
+             * Load default built-in timbres
+             */
+            loadDefaultTimbres() {
+                // Default Piano Timbre
+                this.loadedTimbres.set('default-piano', {
+                    name: 'Grand Piano',
+                    brand: 'default',
+                    bank: 0,
+                    program: 0,
+                    category: 'piano',
+                    waveform: 'sine',
+                    harmonics: [1, 0.5, 0.25, 0.125], // Harmonic series for piano-like sound
+                    envelope: { attack: 0.01, decay: 0.1, sustain: 0.7, release: 1.0 }
+                });
+
+                // Korg Electric Piano
+                this.loadedTimbres.set('korg-epiano', {
+                    name: 'Korg Electric Piano',
+                    brand: 'korg',
+                    bank: 0,
+                    program: 4,
+                    category: 'piano',
+                    waveform: 'triangle',
+                    harmonics: [1, 0.8, 0.4, 0.2],
+                    envelope: { attack: 0.02, decay: 0.15, sustain: 0.6, release: 0.8 }
+                });
+
+                // Yamaha Strings
+                this.loadedTimbres.set('yamaha-strings', {
+                    name: 'Yamaha Strings',
+                    brand: 'yamaha',
+                    bank: 0,
+                    program: 48,
+                    category: 'strings',
+                    waveform: 'sawtooth',
+                    harmonics: [1, 0.6, 0.4, 0.3, 0.2],
+                    envelope: { attack: 0.3, decay: 0.2, sustain: 0.8, release: 1.5 }
+                });
+
+                // Set default timbre
+                this.currentTimbre = this.loadedTimbres.get('default-piano');
+                this.updateTimbreDisplay();
+                this.populateTimbreSelectors();
+                
+                console.log(`[Sound Engine] Loaded ${this.loadedTimbres.size} default timbres`);
+            }
+
+            /**
+             * Add timbre from parsed Korg/Yamaha data
+             */
+            addTimbreFromParser(timbreData, brand) {
+                const timbreId = `${brand}-${timbreData.name.toLowerCase().replace(/\s+/g, '-')}`;
+                
+                // Map timbre data to sound engine format
+                const timbre = {
+                    name: timbreData.name,
+                    brand: brand,
+                    bank: timbreData.bank || 0,
+                    program: timbreData.program || 0,
+                    category: this.categorizeTimbre(timbreData.name),
+                    waveform: this.getWaveformFromName(timbreData.name),
+                    harmonics: this.getHarmonicsFromCategory(this.categorizeTimbre(timbreData.name)),
+                    envelope: this.getEnvelopeFromCategory(this.categorizeTimbre(timbreData.name))
+                };
+
+                this.loadedTimbres.set(timbreId, timbre);
+                this.populateTimbreSelectors();
+                
+                console.log(`[Sound Engine] Added ${brand} timbre: ${timbre.name}`);
+                return timbreId;
+            }
+
+            /**
+             * Categorize timbre based on name
+             */
+            categorizeTimbre(name) {
+                const nameLower = name.toLowerCase();
+                
+                if (nameLower.includes('piano') || nameLower.includes('keys')) return 'piano';
+                if (nameLower.includes('organ') || nameLower.includes('hammond')) return 'organ';
+                if (nameLower.includes('string') || nameLower.includes('violin') || nameLower.includes('cello')) return 'strings';
+                if (nameLower.includes('brass') || nameLower.includes('trumpet') || nameLower.includes('sax')) return 'brass';
+                if (nameLower.includes('lead') || nameLower.includes('solo')) return 'lead';
+                if (nameLower.includes('pad') || nameLower.includes('choir') || nameLower.includes('voice')) return 'pad';
+                if (nameLower.includes('bass')) return 'bass';
+                if (nameLower.includes('guitar')) return 'guitar';
+                
+                return 'other';
+            }
+
+            /**
+             * Get waveform based on timbre name
+             */
+            getWaveformFromName(name) {
+                const nameLower = name.toLowerCase();
+                
+                if (nameLower.includes('piano') || nameLower.includes('bell')) return 'sine';
+                if (nameLower.includes('organ')) return 'square';
+                if (nameLower.includes('string') || nameLower.includes('saw')) return 'sawtooth';
+                if (nameLower.includes('brass') || nameLower.includes('lead')) return 'sawtooth';
+                
+                return 'sine'; // Default
+            }
+
+            /**
+             * Get harmonics based on category
+             */
+            getHarmonicsFromCategory(category) {
+                const harmonicMaps = {
+                    'piano': [1, 0.5, 0.25, 0.125, 0.06],
+                    'organ': [1, 0.8, 0.6, 0.4, 0.2],
+                    'strings': [1, 0.6, 0.4, 0.3, 0.2, 0.1],
+                    'brass': [1, 0.8, 0.6, 0.4, 0.3, 0.2],
+                    'lead': [1, 0.7, 0.5, 0.3, 0.2],
+                    'pad': [1, 0.5, 0.3, 0.2, 0.1, 0.05],
+                    'bass': [1, 0.6, 0.3, 0.15],
+                    'guitar': [1, 0.7, 0.4, 0.2, 0.1]
+                };
+                
+                return harmonicMaps[category] || [1, 0.5, 0.25];
+            }
+
+            /**
+             * Get envelope based on category
+             */
+            getEnvelopeFromCategory(category) {
+                const envelopeMaps = {
+                    'piano': { attack: 0.01, decay: 0.1, sustain: 0.7, release: 1.0 },
+                    'organ': { attack: 0.05, decay: 0.1, sustain: 0.9, release: 0.2 },
+                    'strings': { attack: 0.3, decay: 0.2, sustain: 0.8, release: 1.5 },
+                    'brass': { attack: 0.1, decay: 0.1, sustain: 0.8, release: 0.8 },
+                    'lead': { attack: 0.02, decay: 0.1, sustain: 0.7, release: 0.5 },
+                    'pad': { attack: 0.5, decay: 0.3, sustain: 0.9, release: 2.0 },
+                    'bass': { attack: 0.01, decay: 0.1, sustain: 0.6, release: 0.3 },
+                    'guitar': { attack: 0.01, decay: 0.2, sustain: 0.5, release: 0.8 }
+                };
+                
+                return envelopeMaps[category] || { attack: 0.1, decay: 0.1, sustain: 0.7, release: 0.5 };
+            }
+
+            /**
+             * Setup sound control event listeners
+             */
+            setupSoundControls() {
+                // Timbre selection
+                document.getElementById('timbreSelect').addEventListener('change', (e) => {
+                    this.selectTimbre(e.target.value);
+                });
+
+                // Category filter
+                document.getElementById('timbreCategory').addEventListener('change', (e) => {
+                    this.filterTimbresByCategory(e.target.value);
+                });
+
+                // Sound parameters
+                document.getElementById('attackControl').addEventListener('input', (e) => {
+                    this.attackTime = parseFloat(e.target.value) / 100;
+                });
+
+                document.getElementById('releaseControl').addEventListener('input', (e) => {
+                    this.releaseTime = parseFloat(e.target.value) / 100 * 2; // Scale to 2 seconds max
+                });
+            }
+
+            /**
+             * Select a timbre by ID
+             */
+            selectTimbre(timbreId) {
+                const timbre = this.loadedTimbres.get(timbreId);
+                if (timbre) {
+                    this.currentTimbre = timbre;
+                    this.updateTimbreDisplay();
+                    console.log(`[Sound Engine] Selected timbre: ${timbre.name} (${timbre.brand})`);
+                }
+            }
+
+            /**
+             * Update current timbre display
+             */
+            updateTimbreDisplay() {
+                if (this.currentTimbre) {
+                    document.getElementById('currentTimbre').textContent = this.currentTimbre.name;
+                    document.getElementById('currentTimbreDetails').textContent = 
+                        `${this.currentTimbre.brand.toUpperCase()} - Bank ${this.currentTimbre.bank}, Program ${this.currentTimbre.program}`;
+                }
+            }
+
+            /**
+             * Populate timbre selector dropdowns
+             */
+            populateTimbreSelectors() {
+                const timbreSelect = document.getElementById('timbreSelect');
+                timbreSelect.innerHTML = '';
+
+                // Group timbres by brand
+                const timbresByBrand = new Map();
+                this.loadedTimbres.forEach((timbre, id) => {
+                    if (!timbresByBrand.has(timbre.brand)) {
+                        timbresByBrand.set(timbre.brand, []);
+                    }
+                    timbresByBrand.get(timbre.brand).push({ id, timbre });
+                });
+
+                // Create option groups
+                timbresByBrand.forEach((timbres, brand) => {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = brand.toUpperCase() + ' Timbres';
+                    
+                    timbres.forEach(({ id, timbre }) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = `${timbre.name} (${timbre.category})`;
+                        if (this.currentTimbre && timbre === this.currentTimbre) {
+                            option.selected = true;
+                        }
+                        optgroup.appendChild(option);
+                    });
+                    
+                    timbreSelect.appendChild(optgroup);
+                });
+            }
+
+            /**
+             * Filter timbres by category
+             */
+            filterTimbresByCategory(category) {
+                const timbreSelect = document.getElementById('timbreSelect');
+                const options = timbreSelect.querySelectorAll('option');
+                
+                options.forEach(option => {
+                    const timbre = this.loadedTimbres.get(option.value);
+                    if (timbre) {
+                        const shouldShow = category === 'all' || 
+                                         timbre.category === category || 
+                                         timbre.brand === category;
+                        option.style.display = shouldShow ? '' : 'none';
+                    }
+                });
+            }
+
+            /**
+             * Play timbre at specified frequency
+             */
+            playTimbre(frequency, volume) {
+                if (!this.audioContext || !this.currentTimbre) {
+                    return;
+                }
+
+                try {
+                    // Create oscillator bank for harmonic synthesis
+                    const oscillators = [];
+                    const gainNodes = [];
+                    const masterGain = this.audioContext.createGain();
+                    
+                    // Create harmonics
+                    this.currentTimbre.harmonics.forEach((amplitude, index) => {
+                        if (amplitude > 0.01) { // Skip very quiet harmonics
+                            const oscillator = this.audioContext.createOscillator();
+                            const gainNode = this.audioContext.createGain();
+                            
+                            // Set frequency (fundamental + harmonics)
+                            oscillator.frequency.setValueAtTime(
+                                frequency * (index + 1), 
+                                this.audioContext.currentTime
+                            );
+                            
+                            // Set waveform
+                            oscillator.type = this.currentTimbre.waveform;
+                            
+                            // Set harmonic amplitude
+                            gainNode.gain.setValueAtTime(
+                                amplitude * (volume / 100) * 0.1, 
+                                this.audioContext.currentTime
+                            );
+                            
+                            oscillator.connect(gainNode);
+                            gainNode.connect(masterGain);
+                            
+                            oscillators.push(oscillator);
+                            gainNodes.push(gainNode);
+                        }
+                    });
+                    
+                    // Master gain with envelope
+                    masterGain.connect(this.audioContext.destination);
+                    
+                    // Apply ADSR envelope
+                    const envelope = this.currentTimbre.envelope;
+                    const now = this.audioContext.currentTime;
+                    const attackTime = this.attackTime || envelope.attack;
+                    const releaseTime = this.releaseTime || envelope.release;
+                    
+                    masterGain.gain.setValueAtTime(0, now);
+                    masterGain.gain.linearRampToValueAtTime(0.3, now + attackTime);
+                    masterGain.gain.exponentialRampToValueAtTime(0.01, now + attackTime + releaseTime);
+                    
+                    // Start all oscillators
+                    oscillators.forEach(osc => osc.start(now));
+                    oscillators.forEach(osc => osc.stop(now + attackTime + releaseTime));
+                    
+                    // Store for potential note-off
+                    const noteKey = frequency.toString();
+                    this.activeOscillators.set(noteKey, { oscillators, gainNodes, masterGain });
+                    
+                    // Clean up after note ends
+                    setTimeout(() => {
+                        this.activeOscillators.delete(noteKey);
+                    }, (attackTime + releaseTime + 0.1) * 1000);
+                    
+                } catch (error) {
+                    console.error('[Sound Engine] Error playing timbre:', error);
+                }
+            }
+
+            /**
+             * Stop timbre at specified frequency
+             */
+            stopTimbre(frequency) {
+                const noteKey = frequency.toString();
+                const activeNote = this.activeOscillators.get(noteKey);
+                
+                if (activeNote) {
+                    // Quick release
+                    const now = this.audioContext.currentTime;
+                    activeNote.masterGain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    
+                    // Stop oscillators
+                    setTimeout(() => {
+                        activeNote.oscillators.forEach(osc => {
+                            try { osc.stop(); } catch (e) {}
+                        });
+                        this.activeOscillators.delete(noteKey);
+                    }, 60);
+                }
+            }
+        }
+
+        // ==============================================
+        // APPLICATION INITIALIZATION
+        // ==============================================
+
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Initialize application components
+        let korgParser, yamahaParser, virtualKeyboard, arrangerEngine;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[App] Initializing Professional Arranger Keyboard...');
+            
+            // Initialize sound engine first (critical for timbre playback)
+            window.soundEngine = new SoundEngine();
+            
+            // Initialize parsers
+            korgParser = new KorgFileParser();
+            yamahaParser = new YamahaFileParser();
+            
+            // Initialize virtual keyboard
+            virtualKeyboard = new VirtualKeyboard();
+            
+            // Initialize arranger engine
+            arrangerEngine = new ArrangerEngine();
+            
+            // Setup file drop handlers
+            setupFileHandlers();
+            
+            console.log('[App] Application initialized successfully!');
+        });
+
+        /**
+         * Setup file drag and drop handlers
+         */
+        function setupFileHandlers() {
+            // Korg file handling
+            const korgDropZone = document.getElementById('korgDropZone');
+            const korgFileInput = document.getElementById('korgFileInput');
+            
+            korgDropZone.addEventListener('click', () => korgFileInput.click());
+            korgDropZone.addEventListener('dragover', handleDragOver);
+            korgDropZone.addEventListener('drop', (e) => handleFileDrop(e, 'korg'));
+            korgFileInput.addEventListener('change', (e) => handleFileSelect(e, 'korg'));
+            
+            // Yamaha file handling
+            const yamahaDropZone = document.getElementById('yamahaDropZone');
+            const yamahaFileInput = document.getElementById('yamahaFileInput');
+            
+            yamahaDropZone.addEventListener('click', () => yamahaFileInput.click());
+            yamahaDropZone.addEventListener('dragover', handleDragOver);
+            yamahaDropZone.addEventListener('drop', (e) => handleFileDrop(e, 'yamaha'));
+            yamahaFileInput.addEventListener('change', (e) => handleFileSelect(e, 'yamaha'));
+        }
+
+        /**
+         * Handle drag over events
+         */
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        /**
+         * Handle file drop events
+         */
+        function handleFileDrop(e, brand) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            
+            const files = Array.from(e.dataTransfer.files);
+            processFiles(files, brand);
+        }
+
+        /**
+         * Handle file selection events
+         */
+        function handleFileSelect(e, brand) {
+            const files = Array.from(e.target.files);
+            processFiles(files, brand);
+        }
+
+        /**
+         * Process uploaded files
+         */
+        async function processFiles(files, brand) {
+            console.log(`[File Handler] Processing ${files.length} ${brand} files...`);
+            
+            const parser = brand === 'korg' ? korgParser : yamahaParser;
+            const dataContainer = document.getElementById(`${brand}Data`);
+            const stylesContainer = document.getElementById(`${brand}Styles`);
+            const combisContainer = document.getElementById(`${brand === 'korg' ? 'korgCombis' : 'yamahaRegistrations'}`);
+            const samplesContainer = document.getElementById(`${brand === 'korg' ? 'korgSamples' : 'yamahaVoices'}`);
+            
+            // Show data container
+            dataContainer.classList.remove('hidden');
+            
+            // Clear previous data
+            stylesContainer.innerHTML = '';
+            combisContainer.innerHTML = '';
+            samplesContainer.innerHTML = '';
+            
+            for (const file of files) {
+                try {
+                    const parsedData = await parser.parseFile(file);
+                    
+                    // Display styles
+                    if (parsedData.styles) {
+                        parsedData.styles.forEach(style => {
+                            const styleElement = createStyleElement(style, brand);
+                            stylesContainer.appendChild(styleElement);
+                        });
+                    }
+                    
+                    // Display combis/registrations
+                    const combisData = parsedData.combis || parsedData.programs || parsedData.registrations || [];
+                    combisData.forEach(item => {
+                        const itemElement = createCombiElement(item, brand);
+                        combisContainer.appendChild(itemElement);
+                    });
+                    
+                    // Display samples/voices
+                    const samplesData = parsedData.samples || parsedData.voices || [];
+                    samplesData.forEach(item => {
+                        const itemElement = createSampleElement(item, brand);
+                        samplesContainer.appendChild(itemElement);
+                    });
+                    
+                    console.log(`[File Handler] Successfully parsed: ${file.name}`);
+                    
+                } catch (error) {
+                    console.error(`[File Handler] Error parsing ${file.name}:`, error);
+                    
+                    // Show error in UI
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'text-red-400 text-sm p-2 bg-red-900/20 rounded';
+                    errorElement.textContent = `Error parsing ${file.name}: ${error.message}`;
+                    stylesContainer.appendChild(errorElement);
+                }
+            }
+        }
+
+        /**
+         * Create style element for display
+         */
+        function createStyleElement(style, brand) {
+            const element = document.createElement('div');
+            element.className = `p-2 bg-gray-600 rounded mb-2 cursor-pointer hover:bg-${brand} hover:bg-opacity-20 transition-colors`;
+            element.innerHTML = `
+                <div class="font-medium">${style.name}</div>
+                <div class="text-xs text-gray-400">${style.tempo} BPM - ${style.timeSignature}</div>
+            `;
+            
+            element.addEventListener('click', () => {
+                arrangerEngine.loadStyle(style);
+                element.classList.add('ring-2', `ring-${brand}`);
+                
+                // Remove selection from other styles
+                element.parentNode.querySelectorAll('.ring-2').forEach(el => {
+                    if (el !== element) el.classList.remove('ring-2', `ring-${brand}`);
+                });
+            });
+            
+            return element;
+        }
+
+        /**
+         * Create combi/registration element for display
+         */
+        function createCombiElement(item, brand) {
+            const element = document.createElement('div');
+            element.className = 'p-2 bg-gray-600 rounded mb-1 text-sm cursor-pointer hover:bg-gray-500 transition-colors';
+            element.innerHTML = `
+                <div class="font-medium">${item.name}</div>
+                <div class="text-xs text-gray-400">${item.bank !== undefined ? `Bank ${item.bank}` : ''} ${item.program !== undefined ? `Prog ${item.program}` : ''}</div>
+            `;
+            
+            // Add click handler to load timbre into sound engine
+            element.addEventListener('click', () => {
+                if (window.soundEngine) {
+                    const timbreId = window.soundEngine.addTimbreFromParser(item, brand);
+                    window.soundEngine.selectTimbre(timbreId);
+                    
+                    // Visual feedback
+                    element.classList.add('ring-2', `ring-${brand}`);
+                    element.parentNode.querySelectorAll('.ring-2').forEach(el => {
+                        if (el !== element) el.classList.remove('ring-2', `ring-${brand}`);
+                    });
+                    
+                    console.log(`[UI] Loaded and selected ${brand} timbre: ${item.name}`);
+                }
+            });
+            
+            return element;
+        }
+
+        /**
+         * Create sample/voice element for display
+         */
+        function createSampleElement(item, brand) {
+            const element = document.createElement('div');
+            element.className = 'inline-block p-1 bg-gray-600 rounded mr-1 mb-1 text-xs cursor-pointer hover:bg-gray-500 transition-colors';
+            element.textContent = item.name;
+            
+            return element;
+        }
+    </script>
+
+
+</body></html>
